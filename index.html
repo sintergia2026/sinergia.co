@@ -7,543 +7,386 @@
 
 <style>
 :root{
-  --bg0:#070A0E;
-  --bg1:#0A0F16;
-  --fg:#E6E9ED;
-  --muted:rgba(230,233,237,0.62);
-  --faint:rgba(230,233,237,0.38);
-
-  /* lines & panels */
-  --line:rgba(255,255,255,0.08);
+  --bg0:#06080B;
+  --bg1:#0A0F15;
+  --fg:#E8EDF2;
+  --muted:rgba(232,237,242,0.62);
+  --faint:rgba(232,237,242,0.40);
+  --line:rgba(255,255,255,0.10);
   --line2:rgba(255,255,255,0.06);
-  --panel:rgba(255,255,255,0.035);
-  --panel2:rgba(255,255,255,0.045); /* slightly stronger (left panel boost) */
+  --panel:rgba(255,255,255,0.028);
+  --panel2:rgba(255,255,255,0.016);
+  --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 
-  /* glow (A: visible, controlled) */
-  --coreGlow1: rgba(96, 174, 255, 0.22);
-  --coreGlow2: rgba(96, 174, 255, 0.10);
-  --coreGlow3: rgba(96, 174, 255, 0.06);
-
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-
-  --r:18px;
+  /* “Energy” should be implied, not declared */
+  --coreGlow1: rgba(120,170,255,0.16);
+  --coreGlow2: rgba(120,170,255,0.08);
+  --coreGlow3: rgba(120,170,255,0.00);
 }
 
-*{box-sizing:border-box}
+*{ box-sizing:border-box; }
+
+html,body{ height:100%; }
 
 body{
   margin:0;
-  background:
-    radial-gradient(1200px 650px at 48% 52%, rgba(88,160,255,0.10), transparent 60%),
-    radial-gradient(900px 500px at 50% 55%, rgba(0,0,0,0.0), rgba(0,0,0,0.55) 70%),
-    linear-gradient(180deg, var(--bg1), var(--bg0));
   color:var(--fg);
   font-family:var(--sans);
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  overflow:hidden;
+
+  /* Aerospace-grade quiet background */
+  background:
+    radial-gradient(1200px 700px at 50% 42%, rgba(80,120,200,0.10), rgba(0,0,0,0.0) 60%),
+    radial-gradient(900px 500px at 50% 58%, rgba(20,35,55,0.55), rgba(0,0,0,0.0) 62%),
+    radial-gradient(1100px 900px at 50% 50%, rgba(0,0,0,0.35), rgba(0,0,0,0.95) 70%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+  overflow-x:hidden;
 }
 
-/* ====== BACKGROUND TECH FIELD (HEX SILHOUETTES) ====== */
-.bg-tech{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:1;
-  z-index:0;
+/* --- Background engineering field: grid + hex silhouettes (subtle) --- */
+.field{
+  position:relative;
+  width:min(1180px,92vw);
+  padding:70px 20px 64px;
 }
 
-/* subtle vertical scan / vignette */
-.bg-tech::before{
+.field::before{
   content:"";
   position:absolute;
-  inset:-40px;
+  inset:-60px -80px;
+  pointer-events:none;
+  opacity:0.22;
+
+  /* fine grid */
   background:
-    radial-gradient(900px 600px at 50% 50%, rgba(255,255,255,0.02), transparent 62%),
-    radial-gradient(1200px 800px at 50% 55%, rgba(0,0,0,0.0), rgba(0,0,0,0.58) 70%),
-    linear-gradient(90deg, rgba(255,255,255,0.02), transparent 18%, transparent 82%, rgba(255,255,255,0.02));
-  filter: blur(0.2px);
-  opacity:0.95;
+    linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 220px 220px;
+  filter: blur(0.1px);
+  mask-image: radial-gradient(closest-side at 50% 50%, rgba(0,0,0,0.85), rgba(0,0,0,0.10) 70%, rgba(0,0,0,0.0));
 }
 
-/* hexfield aligned to core (center) */
-.hexfield{
+.field::after{
+  content:"";
   position:absolute;
-  inset:0;
-  background:
-    /* large hex silhouettes */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='450' viewBox='0 0 520 450'%3E%3Cg fill='none' stroke='%23FFFFFF' stroke-opacity='0.06' stroke-width='2'%3E%3Cpath d='M260 40 405 125 405 295 260 380 115 295 115 125Z'/%3E%3Cpath d='M260 78 373 145 373 275 260 342 147 275 147 145Z' stroke-opacity='0.04'/%3E%3Cpath d='M260 115 340 164 340 256 260 305 180 256 180 164Z' stroke-opacity='0.03'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 520px 450px;
+  inset:-80px -120px;
+  pointer-events:none;
 
-  /* alignment trick: center the pattern to the page center */
-  background-position: calc(50% - 260px) calc(50% - 225px);
+  /* Hex silhouette field via inline SVG data URI */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='420' viewBox='0 0 520 420'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.10)' stroke-width='1'%3E%3Cpath d='M130 40 L195 78 L195 152 L130 190 L65 152 L65 78 Z'/%3E%3Cpath d='M390 50 L455 88 L455 162 L390 200 L325 162 L325 88 Z'/%3E%3Cpath d='M255 215 L330 258 L330 342 L255 385 L180 342 L180 258 Z'/%3E%3Cpath d='M60 250 L115 282 L115 342 L60 374 L5 342 L5 282 Z'/%3E%3Cpath d='M455 245 L510 277 L510 337 L455 369 L400 337 L400 277 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:repeat;
+  background-size: 520px 420px;
+  opacity:0.16;
 
-  opacity:0.65;
-  filter: blur(0.2px);
-  transform: translateZ(0);
-  mix-blend-mode: normal;
+  /* Quiet the pattern toward edges */
+  mask-image: radial-gradient(closest-side at 50% 50%, rgba(0,0,0,0.80), rgba(0,0,0,0.18) 72%, rgba(0,0,0,0.0));
+  filter: blur(0.25px);
 }
 
-/* faint grid lines for aerospace tension */
-.gridlines{
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 140px 140px;
-  opacity:0.35;
-  mix-blend-mode: normal;
-}
-
-/* ====== MAIN WRAP ====== */
-.wrap{
-  width:min(1180px, 92vw);
-  padding: 70px 20px 60px;
-  position:relative;
-  z-index:2;
-}
-
-/* top micro header line */
-.topline{
-  position:absolute;
-  left:20px;
-  right:20px;
-  top:40px;
-  height:1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-  opacity:0.35;
-}
-
-/* ====== MAST ====== */
+/* --- Masthead --- */
 .mast{
+  position:relative;
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  margin-bottom: 54px;
-}
-
-.meta-left{
-  font-family:var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.14em;
-  color:rgba(230,233,237,0.28);
-  text-transform:uppercase;
-  margin-bottom:10px;
+  margin-bottom:54px;
 }
 
 .brand h1{
   margin:0 0 10px 0;
-  font-size:2.55rem;
+  font-size:2.6rem;
   letter-spacing:0.22em;
   font-weight:600;
-  text-shadow: 0 0 10px rgba(255,255,255,0.03);
+  text-shadow: 0 0 20px rgba(120,170,255,0.06);
+}
+
+.kicker{
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.16em;
+  color:rgba(232,237,242,0.42);
+  text-transform:uppercase;
+  margin-bottom:10px;
 }
 
 .sub{
-  font-size:0.82rem;
+  font-size:0.80rem;
   letter-spacing:0.18em;
   color:var(--muted);
   text-transform:uppercase;
 }
 
 .sub2{
-  margin-top:10px;
+  margin-top:8px;
   font-family:var(--mono);
   font-size:0.72rem;
-  letter-spacing:0.12em;
-  color:rgba(230,233,237,0.34);
+  letter-spacing:0.14em;
+  color:rgba(232,237,242,0.42);
   text-transform:uppercase;
 }
 
-/* badge */
 .badge{
   font-family:var(--mono);
-  font-size:0.75rem;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,0.03);
+  font-size:0.74rem;
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.014));
   padding:12px 14px;
   border-radius:14px;
-  line-height:1.65;
-  color:rgba(230,233,237,0.48);
+  line-height:1.6;
+  color:rgba(232,237,242,0.52);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02) inset,
-    0 12px 40px rgba(0,0,0,0.45);
-  backdrop-filter: blur(8px);
+    0 10px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-/* ====== GRID ====== */
+/* --- Grid layout --- */
 .grid{
   display:grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 42px;
+  grid-template-columns:1fr 220px 1fr; /* stable center */
+  gap:34px;
   align-items:start;
-  position:relative;
 }
 
-/* structural connectors across the grid (panel ↔ core ↔ panel) */
-.connectors{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
-}
-.connectors::before{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  top: 178px; /* tuned for typical layout; JS will refine if available */
-  height:1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255,255,255,0.06) 18%,
-    rgba(96,174,255,0.07) 50%,
-    rgba(255,255,255,0.06) 82%,
-    transparent 100%);
-  opacity:0.45;
-}
-.connectors::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top: 120px;
-  bottom: 30px;
-  width:1px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.05), transparent);
-  opacity:0.22;
-}
-
-/* panels */
+/* --- Panels --- */
 .panel{
-  border:1px solid var(--line);
-  background: var(--panel);
-  padding: 26px;
-  border-radius: var(--r);
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg, rgba(255,255,255,0.030), rgba(255,255,255,0.016));
+  padding:26px 26px 24px;
+  border-radius:18px;
   line-height:1.75;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02) inset,
-    0 24px 70px rgba(0,0,0,0.55);
-  backdrop-filter: blur(10px);
-  position:relative;
-  z-index:2;
+    0 18px 50px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
 }
 
-/* slightly stronger left panel presence (+2%) */
-.panel.panel-left{
-  background: var(--panel2);
-  border-color: rgba(255,255,255,0.09);
-}
-
-/* panel header */
 h2{
-  margin: 0 0 10px 0;
-  font-size:0.95rem;
+  margin:0 0 14px 0;
+  font-size:0.92rem;
   letter-spacing:0.16em;
   text-transform:uppercase;
-  color: rgba(230,233,237,0.62);
-  font-weight:600;
+  color:rgba(232,237,242,0.58);
 }
 
-/* micro divider under each h2 (aerospace tension) */
-.h2-rule{
-  height:1px;
-  width:100%;
-  margin: 10px 0 14px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02), transparent);
-  opacity:0.55;
-}
-
-p{
-  margin: 0 0 14px 0;
-  color: rgba(230,233,237,0.75);
-}
+p{ margin:0 0 18px 0; color:rgba(232,237,242,0.80); }
 
 ul{
-  padding-left: 18px;
-  margin: 10px 0 0;
-  color: rgba(230,233,237,0.78);
+  margin:0;
+  padding-left:18px;
+  color:rgba(232,237,242,0.78);
 }
 
-li{ margin: 6px 0; }
+li{ margin:8px 0; }
 
-/* emphasize tokens like NONE/CLOSED/etc */
-strong.token{
-  letter-spacing:0.06em;
+strong{
   font-weight:700;
+  letter-spacing:0.04em;
 }
 
-/* ====== CORE MODULE ====== */
-.core{
-  width: 220px; /* module width */
+/* --- CORE NODE (sealed) --- */
+.core-wrap{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap: 12px;
-  position:relative;
-  z-index:3;
+  gap:14px;
+  padding-top:8px;
 }
 
-/* core housing */
-.core-card{
-  width: 220px;
-  height: 220px;
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,0.10);
-  background:
-    radial-gradient(220px 220px at 50% 45%, rgba(96,174,255,0.10), transparent 60%),
-    rgba(255,255,255,0.03);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.03) inset,
-    0 28px 80px rgba(0,0,0,0.62);
-  backdrop-filter: blur(10px);
+/* Outer sealed frame */
+.core-node{
+  width:220px;
+  height:220px;
+  border-radius:18px;
+  position:relative;
   display:flex;
   justify-content:center;
   align-items:center;
-  position:relative;
-  overflow:hidden;
+
+  /* Sealed capsule: double border + internal quiet energy */
+  background:
+    radial-gradient(130px 130px at 50% 45%, var(--coreGlow1), var(--coreGlow3) 70%),
+    radial-gradient(200px 200px at 50% 55%, var(--coreGlow2), var(--coreGlow3) 72%),
+    linear-gradient(180deg, rgba(255,255,255,0.030), rgba(255,255,255,0.012));
+
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 24px 70px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
 }
 
-/* inner hex silhouette emboss inside the core */
-.core-card::before{
+/* Inner seal ring */
+.core-node::before{
   content:"";
   position:absolute;
-  inset:-20px;
-  background:
-    radial-gradient(200px 200px at 50% 50%, rgba(255,255,255,0.03), transparent 62%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='360' viewBox='0 0 520 450'%3E%3Cg fill='none' stroke='%23FFFFFF' stroke-opacity='0.08' stroke-width='2'%3E%3Cpath d='M260 40 405 125 405 295 260 380 115 295 115 125Z'/%3E%3Cpath d='M260 78 373 145 373 275 260 342 147 275 147 145Z' stroke-opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position: center;
-  background-size: 420px 360px;
-  opacity:0.35;
-  filter: blur(0.25px);
-}
-
-/* controlled halo (A) */
-.core-card::after{
-  content:"";
-  position:absolute;
-  inset:-60px;
-  background:
-    radial-gradient(260px 260px at 50% 50%, var(--coreGlow1), transparent 60%),
-    radial-gradient(420px 420px at 50% 50%, var(--coreGlow2), transparent 62%),
-    radial-gradient(620px 620px at 50% 50%, var(--coreGlow3), transparent 70%);
-  opacity:0.70;
+  inset:14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.04);
   pointer-events:none;
 }
 
-/* logo */
-.core-card img{
-  width: 152px; /* slightly larger so it reads better */
-  height:auto;
-  opacity:0.92;
-  filter:
-    drop-shadow(0 0 10px rgba(96,174,255,0.10))
-    drop-shadow(0 0 22px rgba(96,174,255,0.06));
-  position:relative;
-  z-index:2;
+/* Hex emboss silhouette (subtle, not decorative) */
+.core-node::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.10)' stroke-width='1'%3E%3Cpath d='M150 42 L236 92 L236 208 L150 258 L64 208 L64 92 Z'/%3E%3Cpath d='M150 62 L220 104 L220 196 L150 238 L80 196 L80 104 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size: 78% 78%;
+  opacity:0.14;
+  filter: blur(0.15px);
+  pointer-events:none;
 }
 
-/* core label under module */
-.core-label{
-  width: 220px;
-  border:1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.02);
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-family: var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.10em;
-  color: rgba(230,233,237,0.45);
-  text-transform:uppercase;
-  line-height:1.6;
-  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
-  backdrop-filter: blur(10px);
+.core-node img{
+  width:150px;           /* slightly larger (per your rule) */
+  height:auto;
+  opacity:0.92;
+  filter: drop-shadow(0 0 16px rgba(120,170,255,0.10));
 }
-.core-label .row{
+
+/* Core status plaque */
+.core-plaque{
+  width:220px;
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.022), rgba(255,255,255,0.010));
+  padding:10px 12px;
+  font-family:var(--mono);
+  font-size:0.72rem;
+  color:rgba(232,237,242,0.50);
+  line-height:1.55;
+  box-shadow:
+    0 14px 40px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.core-plaque .tag{
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:rgba(232,237,242,0.44);
+}
+
+.core-plaque .row{
   display:flex;
   justify-content:space-between;
   gap:10px;
+  margin-top:6px;
 }
-.core-label .row span:first-child{ opacity:0.75; }
-.core-label .row span:last-child{ color: rgba(230,233,237,0.62); }
 
-/* ====== FOOTER ====== */
+/* Footer */
 .footer{
-  margin-top: 56px;
+  margin-top:52px;
   display:flex;
   justify-content:space-between;
-  align-items:flex-end;
+  gap:18px;
   font-family:var(--mono);
   font-size:0.74rem;
-  color: rgba(230,233,237,0.32);
-  letter-spacing:0.10em;
-  text-transform:uppercase;
-  position:relative;
-  z-index:2;
-}
-.footer::before{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  top:-18px;
-  height:1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
-  opacity:0.25;
+  color:rgba(232,237,242,0.40);
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:18px;
 }
 
-.footer .right{
-  text-align:right;
-}
-
-/* responsive */
+/* Responsiveness: keep structure stable */
 @media (max-width: 980px){
   .grid{
     grid-template-columns:1fr;
-    gap:18px;
+    gap:22px;
   }
-  .core{
-    width:100%;
-    align-items:center;
-  }
-  .core-card, .core-label{
-    width:min(360px, 92vw);
-  }
-  .connectors{ display:none; }
-  .mast{
-    flex-direction:column;
-    gap:18px;
-  }
-}
-
-/* reduce motion */
-@media (prefers-reduced-motion: reduce){
-  .hexfield{ filter:none; }
+  .core-wrap{ order:2; }
+  .panel{ order:1; }
+  .mast{ flex-direction:column; gap:18px; }
+  .badge{ align-self:flex-start; }
+  .footer{ flex-direction:column; }
 }
 </style>
 </head>
 
 <body>
-  <div class="bg-tech">
-    <div class="hexfield"></div>
-    <div class="gridlines"></div>
-  </div>
+<main class="field">
 
-  <main class="wrap">
-    <div class="topline"></div>
+  <header class="mast">
+    <div class="brand">
+      <div class="kicker">PUBLIC INTERFACE NODE — IAL-0001</div>
+      <h1>SINTERGIA™</h1>
+      <div class="sub">Institutional Architecture Layer</div>
+      <div class="sub2">SYSTEM CLASS: INFRASTRUCTURE / DECLARATIVE</div>
+    </div>
 
-    <header class="mast">
-      <div class="brand">
-        <div class="meta-left">PUBLIC INTERFACE NODE — IAL-0001</div>
-        <h1>SINTERGIA™</h1>
-        <div class="sub">Institutional Architecture Layer</div>
-        <div class="sub2">SYSTEM CLASS: INFRASTRUCTURE / DECLARATIVE</div>
+    <div class="badge">
+      STATUS: Foundational<br>
+      MODE: Declarative / Non-Operational<br>
+      INTERFACES: None (Public Layer)<br>
+      CONTROL: Internal Governance<br>
+      REV: IAL v6.4
+    </div>
+  </header>
+
+  <section class="grid">
+
+    <div class="panel">
+      <h2>Architectural Declaration</h2>
+      <p>
+        SINTERGIA™ establishes structural intent, institutional boundaries, and governance posture for a systems-oriented cognitive engineering infrastructure.
+      </p>
+
+      <h2>Operational Constraint</h2>
+      <ul>
+        <li>No active systems operate in the public layer.</li>
+        <li>No execution environment is exposed.</li>
+        <li>No integration endpoints are declared.</li>
+        <li>All capability activation remains internally governed.</li>
+      </ul>
+    </div>
+
+    <!-- CENTER: SEALED CORE NODE -->
+    <div class="core-wrap" aria-label="Core Node">
+      <div class="core-node">
+        <img src="logo.png" alt="SINTERGIA Symbol">
       </div>
 
-      <div class="badge">
-        STATUS: Foundational<br>
-        MODE: Declarative / Non-Operational<br>
-        INTERFACES: None (Public Layer)<br>
-        CONTROL: Internal Governance<br>
-        REV: IAL v6.3
+      <div class="core-plaque">
+        <div class="tag">[ CORE NODE ]</div>
+        <div class="row"><span>STATE:</span><span>INACTIVE</span></div>
+        <div class="row"><span>LAYER:</span><span>PUBLIC SHELL</span></div>
       </div>
-    </header>
+    </div>
 
-    <section class="grid" id="grid">
-      <div class="connectors"></div>
+    <div class="panel">
+      <h2>Framework Architecture</h2>
+      <ul>
+        <li><strong>CORE</strong> — Institutional Intent Node</li>
+        <li><strong>ORG</strong> — Structural Role Containers</li>
+        <li><strong>ENG</strong> — System Boundary Layer</li>
+        <li><strong>SEGIS</strong> — Engineering Identity Standard</li>
+      </ul>
 
-      <div class="panel panel-left">
-        <h2>Architectural Declaration</h2>
-        <div class="h2-rule"></div>
-        <p>
-          SINTERGIA™ establishes structural intent, institutional boundaries, and governance posture for a systems-oriented cognitive engineering infrastructure.
-        </p>
+      <h2>Public Posture</h2>
+      <ul>
+        <li>Capability Exposure: <strong>NONE</strong></li>
+        <li>Interface Surface: <strong>CLOSED</strong></li>
+        <li>Collaboration Mode: <strong>DISABLED</strong></li>
+        <li>Execution Authority: <strong>UNDECLARED</strong></li>
+      </ul>
+    </div>
 
-        <h2>Operational Constraint</h2>
-        <div class="h2-rule"></div>
-        <ul>
-          <li>No active systems operate in the public layer.</li>
-          <li>No execution environment is exposed.</li>
-          <li>No integration endpoints are declared.</li>
-          <li>All capability activation remains internally governed.</li>
-        </ul>
-      </div>
+  </section>
 
-      <!-- CORE MODULE -->
-      <div class="core" id="core">
-        <div class="core-card" id="coreCard">
-          <img src="logo.png" alt="SINTERGIA Symbol">
-        </div>
+  <footer class="footer">
+    <div>DOC ID: IAL-0001 | CLASSIFICATION: PUBLIC / FOUNDATIONAL</div>
+    <div>© SINTERGIA™ — Institutional Infrastructure | AUTHORITY: SINTERGIA.CO</div>
+  </footer>
 
-        <div class="core-label">
-          <div class="row"><span>[ CORE NODE ]</span><span></span></div>
-          <div class="row"><span>STATE:</span><span>INACTIVE</span></div>
-          <div class="row"><span>LAYER:</span><span>PUBLIC SHELL</span></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>Framework Architecture</h2>
-        <div class="h2-rule"></div>
-        <ul>
-          <li><strong class="token">CORE</strong> — Institutional Intent Node</li>
-          <li><strong class="token">ORG</strong> — Structural Role Containers</li>
-          <li><strong class="token">ENG</strong> — System Boundary Layer</li>
-          <li><strong class="token">SEGIS</strong> — Engineering Identity Standard</li>
-        </ul>
-
-        <h2>Public Posture</h2>
-        <div class="h2-rule"></div>
-        <ul>
-          <li>Capability Exposure: <strong class="token">NONE</strong></li>
-          <li>Interface Surface: <strong class="token">CLOSED</strong></li>
-          <li>Collaboration Mode: <strong class="token">DISABLED</strong></li>
-          <li>Execution Authority: <strong class="token">UNDECLARED</strong></li>
-        </ul>
-      </div>
-
-    </section>
-
-    <footer class="footer">
-      <div>DOC ID: IAL-0001 | CLASSIFICATION: PUBLIC / FOUNDATIONAL</div>
-      <div class="right">© SINTERGIA™ — Institutional Infrastructure<br>AUTHORITY: SINTERGIA.CO</div>
-    </footer>
-  </main>
-
-<script>
-/* Optional: micro-align connector line to the core center so it feels engineered.
-   Safe: if it fails, layout remains perfect. */
-(function(){
-  const grid = document.getElementById('grid');
-  const coreCard = document.getElementById('coreCard');
-  const connectors = grid ? grid.querySelector('.connectors') : null;
-  if(!grid || !coreCard || !connectors) return;
-
-  const gridRect = grid.getBoundingClientRect();
-  const coreRect = coreCard.getBoundingClientRect();
-
-  // place horizontal line at core vertical center (relative to grid)
-  const y = (coreRect.top + coreRect.height/2) - gridRect.top;
-  connectors.style.setProperty('--connY', y + 'px');
-
-  // apply the computed position
-  connectors.style.setProperty('top', '0px');
-  connectors.style.setProperty('left', '0px');
-
-  // update pseudo-element position by injecting a small style rule
-  const style = document.createElement('style');
-  style.textContent = `
-    .connectors::before{ top: ${Math.round(y)}px !important; }
-  `;
-  document.head.appendChild(style);
-})();
-</script>
-
+</main>
 </body>
 </html>
